@@ -1,0 +1,50 @@
+/* SPDX-License-Identifier: MIT-0 */
+/dts-v1/;
+
+/ {
+	#address-cells = <2>;
+	#size-cells = <1>;
+
+
+	passthrough {
+		compatible = "simple-bus";
+		ranges;
+		#address-cells = <2>;
+		#size-cells = <1>;
+
+        	clocks {
+
+		       l4_mp_clk: l4-mp-clk {
+	                        #clock-cells = <0x00>;
+		                compatible = "fixed-clock";
+	                        clock-frequency = <0xbebc200>;
+                        	//phandle = <0x0a>;
+                	};
+
+                	mmc_clk: mmc-clk {
+                        	#clock-cells = <0x00>;
+                        	compatible = "fixed-clock";
+                        	clock-frequency = <0x2faf080>;
+                        	//phandle = <0x0b>;
+                	};
+        	};
+
+                mmc@ff808000 {
+                        compatible = "altr,socfpga-dw-mshc";
+                        reg = <0x0 0xff808000 0x1000>;
+                        #address-cells = <0x01>;
+                        #size-cells = <0x00>;
+                        interrupts = <0x00 0x60 0x04 0x0 0x60 0x04>;
+			interrupt-parent = <0xfde8>;
+                        fifo-depth = <0x400>;
+                        clocks = <&l4_mp_clk &mmc_clk>;
+                        clock-names = "biu\0ciu";
+                        status = "okay";
+                        cap-sd-highspeed;
+                        broken-cd;
+                        bus-width = <0x04>;
+                        xen,reg = <0x0 0xff808000 0x1000 0x0 0xff808000>;
+                        xen,path = "/soc/mmc@ff808000";
+                };
+	};
+};

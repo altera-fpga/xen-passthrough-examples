@@ -1,0 +1,44 @@
+/* SPDX-License-Identifier: MIT-0 */
+/dts-v1/;
+
+/ {
+	#address-cells = <2>;
+	#size-cells = <2>;
+
+	passthrough {
+		compatible = "simple-bus";
+		ranges;
+		#address-cells = <2>;
+		#size-cells = <2>;
+
+		clocks {
+			l4_mp_clk: l4-mp-clk {
+				#clock-cells = <0x00>;
+				compatible = "fixed-clock";
+				clock-frequency = <0xbebc200>;
+			};
+		};
+
+		usbphy0: usbphy {
+			#phy-cells = <0>;
+			compatible = "usb-nop-xceiv";
+		};
+
+		usb1@11000000 {
+			compatible = "intel,agilex5-dwc3", "snps,dwc3";
+			reg = <0x0 0x11000000 0x0 0x100000>;
+			clocks = <&l4_mp_clk &l4_mp_clk>;
+			interrupts = <0x00 0x5e 0x04>;
+			interrupt-parent = <0xfde8>;
+			phys = <&usbphy0 &usbphy0>;
+			phy-names = "usb2-phy\0usb3-phy";
+			maximum-speed = "super-speed-plus";
+			snps,dis_u2_sysphy-quirk;
+			snps,dma_set_40_bit_mask_quirk;
+			dr_mode = "host";				
+			status = "okay";
+			xen,reg = <0x0 0x11000000 0x0 0x1000 0x0 0x11000000>;
+			xen,path = "/soc@0/usb1@11000000";
+		};
+	};
+};

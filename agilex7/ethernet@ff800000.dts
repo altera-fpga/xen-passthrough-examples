@@ -1,0 +1,86 @@
+/* SPDX-License-Identifier: MIT-0 */
+/dts-v1/;
+
+/ {
+	#address-cells = <0x02>;
+	#size-cells = <0x02>;
+
+	gic {
+		#interrupt-cells = <0x03>;
+		interrupt-controller;
+	};
+
+	passthrough {
+		compatible = "simple-bus";
+		ranges;
+		#address-cells = <0x02>;
+		#size-cells = <0x02>;
+
+		emac-clk {
+			#clock-cells = <0x00>;
+			compatible = "fixed-clock";
+			clock-frequency = <0x17d78400>;
+			phandle = <0x02>;
+		};
+
+		emac-ptp-clk {
+			#clock-cells = <0x00>;
+			compatible = "fixed-clock";
+			clock-frequency = <0x17d78400>;
+			phandle = <0x03>;
+		};
+
+		sysmgr@ffd12000 {
+			compatible = "altr,sys-mgr-s10\0altr,sys-mgr";
+			reg = <0x00 0xffd12000 0x00 0x500>;
+			status = "okay";
+			xen,reg = <0x00 0xffd12000 0x00 0x500 0x00 0xffd12000>;
+			xen,path = "/soc/sysmgr@ffd12000";
+			phandle = <0x01>;
+		};
+
+		ethernet@ff800000 {
+			compatible = "altr,socfpga-stmmac-a10-s10\0snps,dwmac-3.74a\0snps,dwmac";
+			reg = <0x00 0xff800000 0x00 0x2000>;
+			interrupts = <0x00 0x5a 0x04>;
+			interrupt-names = "macirq";
+			interrupt-parent = <0xfde8>;
+			mac-address = [00 00 00 00 00 00];
+			tx-fifo-depth = <0x4000>;
+			rx-fifo-depth = <0x4000>;
+			snps,multicast-filter-bins = <0x100>;
+			altr,sysmgr-syscon = <0x01 0x44 0x00>;
+			clocks = <0x02 0x03>;
+			clock-names = "stmmaceth\0ptp_ref";
+			status = "okay";
+			phy-mode = "rgmii";
+			phy-handle = <0x04>;
+			max-frame-size = <0x2328>;
+			xen,reg = <0x00 0xff800000 0x00 0x2000 0x00 0xff800000>;
+			xen,path = "/soc/ethernet@ff800000";
+
+			mdio0 {
+				#address-cells = <0x01>;
+				#size-cells = <0x00>;
+				compatible = "snps,dwmac-mdio";
+
+				ethernet-phy@0 {
+					reg = <0x04>;
+					txd0-skew-ps = <0x00>;
+					txd1-skew-ps = <0x00>;
+					txd2-skew-ps = <0x00>;
+					txd3-skew-ps = <0x00>;
+					rxd0-skew-ps = <0x1a4>;
+					rxd1-skew-ps = <0x1a4>;
+					rxd2-skew-ps = <0x1a4>;
+					rxd3-skew-ps = <0x1a4>;
+					txen-skew-ps = <0x00>;
+					txc-skew-ps = <0x384>;
+					rxdv-skew-ps = <0x1a4>;
+					rxc-skew-ps = <0x690>;
+					phandle = <0x04>;
+				};
+			};
+		};
+	};
+};
