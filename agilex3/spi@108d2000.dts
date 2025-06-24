@@ -1,0 +1,72 @@
+/* SPDX-License-Identifier: MIT-0 */
+/* QSPI NOR Flash passthrough example */
+/dts-v1/;
+
+/ {
+	#address-cells = <0x02>;
+	#size-cells = <0x02>;
+
+	passthrough {
+		compatible = "simple-bus";
+		ranges;
+		#address-cells = <0x02>;
+		#size-cells = <0x02>;
+
+		qspi-clk {
+			#clock-cells = <0x00>;
+			compatible = "fixed-clock";
+			clock-frequency = <0x17d78400>;
+			phandle = <0x01>;
+		};
+
+		spi@108d2000 {
+			compatible = "intel,socfpga-qspi\0cdns,qspi-nor";
+			reg = <0x00 0x108d2000 0x00 0x100 0x00 0x10900000 0x00 0x100000>;
+			status = "okay";
+			#address-cells = <0x01>;
+			#size-cells = <0x00>;
+			interrupts = <0x00 0x03 0x04>;
+			cdns,fifo-depth = <0x400>;
+			cdns,fifo-width = <0x04>;
+			cdns,trigger-address = <0x00>;
+			clocks = <0x01>;
+			//xen,force-assign-without-iommu = <0x01>;
+			xen,reg = <0x00 0x108d2000 0x00 0x100 0x00 0x108d2000 0x00 0x10900000 0x00 0x100000 0x00 0x10900000>;
+			xen,path = "/soc/qspi@108d2000";
+
+			flash@0 {
+				#address-cells = <0x01>;
+				#size-cells = <0x01>;
+				compatible = "jedec,spi-nor";
+				reg = <0x00>;
+				spi-max-frequency = <0x5f5e100>;
+				m25p,fast-read;
+				cdns,page-size = <0x100>;
+				cdns,block-size = <0x10>;
+				cdns,read-delay = <0x02>;
+				cdns,tshsl-ns = <0x32>;
+				cdns,tsd2d-ns = <0x32>;
+				cdns,tchsh-ns = <0x04>;
+				cdns,tslch-ns = <0x04>;
+
+				partitions {
+					compatible = "fixed-partitions";
+					#address-cells = <0x01>;
+					#size-cells = <0x01>;
+					rsu-handle = <0x02>;
+
+					partition@0 {
+						label = "u-boot";
+						reg = <0x00 0x600000>;
+						phandle = <0x02>;
+					};
+
+					partition@600000 {
+						label = "root";
+						reg = <0x600000 0x3a00000>;
+					};
+				};
+			};
+		};
+	};
+};
